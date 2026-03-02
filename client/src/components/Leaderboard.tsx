@@ -27,22 +27,27 @@ function CategoryBreakdown({ categories }: { categories: CategoryPicks[] }) {
                   {announced ? `${cat.pointsEarned}/${cat.maxPoints}` : "TBD"}
                 </span>
               </div>
-              {announced && (
-                <div className="winner-row">
-                  <span>{"\u2605"} {cat.winner}</span>
-                </div>
-              )}
-              {cat.picks.map((pick) => (
-                <div
-                  key={pick.nominee}
-                  className={`pick-row ${
-                    announced
-                      ? pick.nominee === cat.winner
-                        ? "is-correct"
-                        : "is-incorrect"
-                      : ""
-                  }`}
-                >
+              {announced && (() => {
+                const pickedWinner = cat.picks.find(p => p.nominee === cat.winner);
+                return (
+                  <>
+                    <div className={`winner-row ${pickedWinner ? "correct" : ""}`}>
+                      <span>{"\u2605"} {cat.winner}</span>
+                      {pickedWinner && <span className="pick-pts">{pickedWinner.points} pts</span>}
+                    </div>
+                    {cat.picks
+                      .filter(p => p.nominee !== cat.winner)
+                      .map(pick => (
+                        <div key={pick.nominee} className="pick-row is-incorrect">
+                          <span>{pick.nominee}</span>
+                          <span className="pick-pts">{pick.points} pts</span>
+                        </div>
+                      ))}
+                  </>
+                );
+              })()}
+              {!announced && cat.picks.map(pick => (
+                <div key={pick.nominee} className="pick-row">
                   <span>{pick.nominee}</span>
                   <span className="pick-pts">{pick.points} pts</span>
                 </div>
