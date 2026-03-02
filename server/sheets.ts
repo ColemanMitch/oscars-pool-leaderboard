@@ -121,4 +121,4 @@ export function getParticipantPicks(
   return { name, email, picks };
 }
 
-export { parsePoints };
+export { parsePoints, parseHeader, parseTsv };
