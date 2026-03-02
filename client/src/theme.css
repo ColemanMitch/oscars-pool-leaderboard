@@ -262,9 +262,13 @@ h3 {
   color: var(--text-secondary);
 }
 
-.pick-row.is-winner {
-  color: var(--gold-light);
+.pick-row.is-correct {
+  color: var(--green);
   font-weight: 600;
+}
+
+.pick-row.is-incorrect {
+  color: var(--red);
 }
 
 .pick-row .pick-pts {

@@ -36,7 +36,11 @@ function CategoryBreakdown({ categories }: { categories: CategoryPicks[] }) {
                 <div
                   key={pick.nominee}
                   className={`pick-row ${
-                    pick.nominee === cat.winner ? "is-winner" : ""
+                    announced
+                      ? pick.nominee === cat.winner
+                        ? "is-correct"
+                        : "is-incorrect"
+                      : ""
                   }`}
                 >
                   <span>{pick.nominee}</span>
