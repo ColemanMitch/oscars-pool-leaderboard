@@ -245,6 +245,15 @@ h3 {
   font-style: italic;
 }
 
+.winner-row {
+  font-size: 0.8rem;
+  padding: 4px 0 2px;
+  color: var(--gold-light);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
 .pick-row {
   display: flex;
   justify-content: space-between;

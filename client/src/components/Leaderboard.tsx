@@ -27,6 +27,11 @@ function CategoryBreakdown({ categories }: { categories: CategoryPicks[] }) {
                   {announced ? `${cat.pointsEarned}/${cat.maxPoints}` : "TBD"}
                 </span>
               </div>
+              {announced && (
+                <div className="winner-row">
+                  <span>{"\u2605"} {cat.winner}</span>
+                </div>
+              )}
               {cat.picks.map((pick) => (
                 <div
                   key={pick.nominee}
@@ -34,14 +39,11 @@ function CategoryBreakdown({ categories }: { categories: CategoryPicks[] }) {
                     pick.nominee === cat.winner ? "is-winner" : ""
                   }`}
                 >
-                  <span>
-                    {pick.nominee === cat.winner ? "\u2605 " : ""}
-                    {pick.nominee}
-                  </span>
+                  <span>{pick.nominee}</span>
                   <span className="pick-pts">{pick.points} pts</span>
                 </div>
               ))}
-              {cat.picks.length === 0 && (
+              {cat.picks.length === 0 && !announced && (
                 <div className="pick-row">
                   <span style={{ fontStyle: "italic" }}>No picks</span>
                 </div>
