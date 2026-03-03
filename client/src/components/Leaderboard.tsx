@@ -166,7 +166,7 @@ export default function Leaderboard() {
 
       <div className="refresh-indicator">
         <span className="refresh-dot" />
-        <span>Live — updates every 15s</span>
+        <span>Live — updates every 30s</span>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { LeaderboardData } from "../types";
 
-export function useLeaderboard(intervalMs = 15_000) {
+export function useLeaderboard(intervalMs = 30_000) {
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
