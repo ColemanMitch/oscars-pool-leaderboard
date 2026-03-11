@@ -28,6 +28,11 @@ function requireAdmin(
   next();
 }
 
+// Health check (used by UptimeRobot to keep Render alive)
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok" });
+});
+
 // GET /api/leaderboard
 app.get("/api/leaderboard", async (_req, res) => {
   try {
