@@ -151,17 +151,23 @@ export default function Leaderboard() {
           <span style={{ textAlign: "right" }}>Max</span>
         </div>
 
-        {data.participants.map((p, i) => (
+        {data.participants.map((p, i, arr) => {
+          const rank =
+            i === 0 || p.totalScore !== arr[i - 1].totalScore
+              ? i + 1
+              : arr.findIndex((x) => x.totalScore === p.totalScore) + 1;
+          return (
           <LeaderboardRow
             key={p.email || p.name}
             participant={p}
-            rank={i + 1}
+            rank={rank}
             expanded={expandedIdx === i}
             onToggle={() =>
               setExpandedIdx(expandedIdx === i ? null : i)
             }
           />
-        ))}
+          );
+        })}
       </div>
 
       <div className="refresh-indicator">
