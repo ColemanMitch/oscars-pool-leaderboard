@@ -68,11 +68,13 @@ function CategoryBreakdown({ categories }: { categories: CategoryPicks[] }) {
 function LeaderboardRow({
   participant,
   rank,
+  isWinner,
   expanded,
   onToggle,
 }: {
   participant: Participant;
   rank: number;
+  isWinner: boolean;
   expanded: boolean;
   onToggle: () => void;
 }) {
@@ -83,7 +85,7 @@ function LeaderboardRow({
         onClick={onToggle}
       >
         <span className="rank">#{rank}</span>
-        <span className="name">{participant.name}</span>
+        <span className="name">{participant.name}{isWinner && " 👑"}</span>
         <span className="score">{participant.totalScore}</span>
         <span className="max-possible">{participant.maxPossible}</span>
       </div>
@@ -156,11 +158,13 @@ export default function Leaderboard() {
             i === 0 || p.totalScore !== arr[i - 1].totalScore
               ? i + 1
               : arr.findIndex((x) => x.totalScore === p.totalScore) + 1;
+          const allAnnounced = data.categoriesAnnounced === data.totalCategories;
           return (
           <LeaderboardRow
             key={p.email || p.name}
             participant={p}
             rank={rank}
+            isWinner={allAnnounced && rank === 1}
             expanded={expandedIdx === i}
             onToggle={() =>
               setExpandedIdx(expandedIdx === i ? null : i)
