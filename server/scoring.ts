@@ -5,7 +5,7 @@ import { getCategories, getParticipantPicks } from "./sheets.js";
 export function computeLeaderboard(
   rows: string[][],
   columns: NomineeColumn[],
-  winners: Record<string, string>
+  winners: Record<string, string[]>
 ): Participant[] {
   const categoryMap = getCategories(columns);
   const participants: Participant[] = [];
@@ -20,17 +20,21 @@ export function computeLeaderboard(
 
     for (const [categoryName, categoryInfo] of categoryMap) {
       const categoryPicks = picks.get(categoryName) || new Map();
-      const winner = winners[categoryName] || null;
+      const categoryWinners = winners[categoryName] || null;
 
       let pointsEarned = 0;
-      if (winner && categoryPicks.has(winner)) {
-        pointsEarned = categoryPicks.get(winner)!;
+      if (categoryWinners) {
+        for (const winner of categoryWinners) {
+          if (categoryPicks.has(winner)) {
+            pointsEarned += categoryPicks.get(winner)!;
+          }
+        }
       }
 
       totalScore += pointsEarned;
 
       // Max possible = points already earned + max points from unannounced categories
-      if (winner) {
+      if (categoryWinners) {
         maxPossible += pointsEarned;
       } else {
         maxPossible += categoryInfo.maxPoints;
@@ -44,7 +48,7 @@ export function computeLeaderboard(
         category: categoryName,
         maxPoints: categoryInfo.maxPoints,
         picks: picksList,
-        winner,
+        winner: categoryWinners,
         pointsEarned,
       });
     }

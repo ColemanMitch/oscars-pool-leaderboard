@@ -11,6 +11,7 @@ export default function AdminPanel() {
   const [loginError, setLoginError] = useState("");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [tieCategory, setTieCategory] = useState<string | null>(null);
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -59,6 +60,24 @@ export default function AdminPanel() {
     }
   }
 
+  async function handleAddTiedWinner(category: string, winner: string) {
+    setLoading(true);
+    try {
+      await fetch("/api/winners/tie", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("admin_token")}`,
+        },
+        body: JSON.stringify({ category, winner }),
+      });
+      setTieCategory(null);
+      await fetchCategories();
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleRemoveWinner(category: string) {
     setLoading(true);
     try {
@@ -68,6 +87,7 @@ export default function AdminPanel() {
           Authorization: `Bearer ${sessionStorage.getItem("admin_token")}`,
         },
       });
+      setTieCategory(null);
       await fetchCategories();
     } finally {
       setLoading(false);
@@ -95,8 +115,8 @@ export default function AdminPanel() {
     );
   }
 
-  const announced = categories.filter((c) => c.winner);
-  const pending = categories.filter((c) => !c.winner);
+  const announced = categories.filter((c) => c.winner && c.winner.length > 0);
+  const pending = categories.filter((c) => !c.winner || c.winner.length === 0);
 
   return (
     <div className="admin-container">
@@ -143,32 +163,86 @@ export default function AdminPanel() {
           <h3 style={{ color: "var(--green)", margin: "24px 0 8px" }}>
             Announced ({announced.length})
           </h3>
-          {announced.map((cat) => (
-            <div key={cat.name} className="admin-category has-winner">
-              <div className="admin-cat-header">
-                <span className="admin-cat-name">{cat.name}</span>
-                <span className="admin-cat-points">{cat.maxPoints} pts</span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <span className="admin-cat-winner">
-                  &#x2713; {cat.winner}
-                </span>
-                <button
-                  className="btn btn-danger"
-                  disabled={loading}
-                  onClick={() => handleRemoveWinner(cat.name)}
+          {announced.map((cat) => {
+            const currentWinners = cat.winner || [];
+            const remainingNominees = cat.nominees.filter(
+              (n) => !currentWinners.includes(n)
+            );
+            const showingTieSelect = tieCategory === cat.name;
+
+            return (
+              <div key={cat.name} className="admin-category has-winner">
+                <div className="admin-cat-header">
+                  <span className="admin-cat-name">{cat.name}</span>
+                  <span className="admin-cat-points">{cat.maxPoints} pts</span>
+                </div>
+                {currentWinners.map((w) => (
+                  <div
+                    key={w}
+                    className="admin-cat-winner"
+                    style={{ marginBottom: 4 }}
+                  >
+                    &#x2713; {w}
+                  </div>
+                ))}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    marginTop: 8,
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
                 >
-                  Undo
-                </button>
+                  {remainingNominees.length > 0 && !showingTieSelect && (
+                    <button
+                      className="btn btn-gold"
+                      disabled={loading}
+                      onClick={() => setTieCategory(cat.name)}
+                      style={{ fontSize: "0.8rem", padding: "4px 12px" }}
+                    >
+                      + Add Tie
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-danger"
+                    disabled={loading}
+                    onClick={() => handleRemoveWinner(cat.name)}
+                  >
+                    Undo
+                  </button>
+                </div>
+                {showingTieSelect && (
+                  <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
+                    <select
+                      className="admin-select"
+                      value=""
+                      disabled={loading}
+                      onChange={(e) => {
+                        if (e.target.value)
+                          handleAddTiedWinner(cat.name, e.target.value);
+                      }}
+                      style={{ flex: 1 }}
+                    >
+                      <option value="">Select tied winner...</option>
+                      {remainingNominees.map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => setTieCategory(null)}
+                      style={{ fontSize: "0.8rem", padding: "4px 12px" }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </>
       )}
     </div>

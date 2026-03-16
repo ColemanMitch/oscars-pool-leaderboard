@@ -7,7 +7,7 @@ export interface CategoryPicks {
   category: string;
   maxPoints: number;
   picks: ParticipantPick[];
-  winner: string | null;
+  winner: string[] | null;
   pointsEarned: number;
 }
 
@@ -21,7 +21,7 @@ export interface Participant {
 
 export interface LeaderboardData {
   participants: Participant[];
-  winners: Record<string, string>;
+  winners: Record<string, string[]>;
   categoriesAnnounced: number;
   totalCategories: number;
   lastUpdated: string;
@@ -31,5 +31,5 @@ export interface Category {
   name: string;
   maxPoints: number;
   nominees: string[];
-  winner: string | null;
+  winner: string[] | null;
 }

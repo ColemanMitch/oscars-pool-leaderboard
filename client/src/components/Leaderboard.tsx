@@ -7,7 +7,8 @@ function CategoryBreakdown({ categories }: { categories: CategoryPicks[] }) {
     <div className="breakdown">
       <div className="breakdown-grid">
         {categories.map((cat) => {
-          const announced = cat.winner !== null;
+          const announced = cat.winner !== null && cat.winner.length > 0;
+          const winners = cat.winner || [];
           return (
             <div
               key={cat.category}
@@ -28,15 +29,19 @@ function CategoryBreakdown({ categories }: { categories: CategoryPicks[] }) {
                 </span>
               </div>
               {announced && (() => {
-                const pickedWinner = cat.picks.find(p => p.nominee === cat.winner);
                 return (
                   <>
-                    <div className={`winner-row ${pickedWinner ? "correct" : ""}`}>
-                      <span>{"\u2605"} {cat.winner}</span>
-                      {pickedWinner && <span className="pick-pts">{pickedWinner.points} pts</span>}
-                    </div>
+                    {winners.map(w => {
+                      const pickedWinner = cat.picks.find(p => p.nominee === w);
+                      return (
+                        <div key={w} className={`winner-row ${pickedWinner ? "correct" : ""}`}>
+                          <span>{"\u2605"} {w}</span>
+                          {pickedWinner && <span className="pick-pts">{pickedWinner.points} pts</span>}
+                        </div>
+                      );
+                    })}
                     {cat.picks
-                      .filter(p => p.nominee !== cat.winner)
+                      .filter(p => !winners.includes(p.nominee))
                       .map(pick => (
                         <div key={pick.nominee} className="pick-row is-incorrect">
                           <span>{pick.nominee}</span>

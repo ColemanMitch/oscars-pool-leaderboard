@@ -4,7 +4,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { fetchSheetData, getCategories } from "./sheets.js";
 import { computeLeaderboard } from "./scoring.js";
-import { getWinners, setWinner, removeWinner } from "./winners.js";
+import { getWinners, setWinner, addTiedWinner, removeWinner } from "./winners.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -85,6 +85,17 @@ app.post("/api/winners", requireAdmin, (req, res) => {
     return;
   }
   setWinner(category, winner);
+  res.json({ success: true, winners: getWinners() });
+});
+
+// POST /api/winners/tie — add an additional tied winner to a category
+app.post("/api/winners/tie", requireAdmin, (req, res) => {
+  const { category, winner } = req.body;
+  if (!category || !winner) {
+    res.status(400).json({ error: "category and winner are required" });
+    return;
+  }
+  addTiedWinner(category, winner);
   res.json({ success: true, winners: getWinners() });
 });
 
